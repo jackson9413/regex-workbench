@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regex Workbench - explain, redos-check and port regexes</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>Regex <span>Workbench</span></h1>
+  <p class="sub">Paste a pattern. Get plain English, a catastrophic-backtracking check, and an engine-by-engine portability verdict.</p>
+</header>
+
+<section class="panel input">
+  <div class="row">
+    <div class="pattern-wrap">
+      <span class="delim">/</span>
+      <input id="pattern" spellcheck="false" autocomplete="off"
+             placeholder="^([\w.]+\.)*[\w]+@([\w-]+\.)+[a-z]{2,}$">
+      <span class="delim">/</span>
+    </div>
+    <button id="analyze" class="primary">Analyze</button>
+  </div>
+  <div class="row flags">
+    <span class="flabel">flags</span>
+    <label><input type="checkbox" class="flag" value="i"> i <em>ignore case</em></label>
+    <label><input type="checkbox" class="flag" value="m"> m <em>multiline</em></label>
+    <label><input type="checkbox" class="flag" value="s"> s <em>dotall</em></label>
+    <label><input type="checkbox" class="flag" value="x"> x <em>verbose</em></label>
+    <label><input type="checkbox" class="flag" value="a"> a <em>ascii</em></label>
+    <select id="samples"><option value="">load a sample...</option></select>
+    <span id="sample-note" class="note"></span>
+  </div>
+</section>
+
+<section id="error" class="panel error hidden"></section>
+
+<section id="score-head" class="panel hidden">
+  <div class="score-wrap">
+    <div id="score-num" class="score">0</div>
+    <div class="score-meta">
+      <span id="verdict" class="verdict">-</span>
+      <div id="verdict-blurb" class="blurb"></div>
+    </div>
+  </div>
+  <div id="axes" class="axes"></div>
+</section>
+
+<nav class="tabs">
+  <button data-tab="explain" class="active">Explain</button>
+  <button data-tab="redos">Backtracking risk <span id="redos-badge" class="badge hidden"></span></button>
+  <button data-tab="engines">Engine matrix</button>
+  <button data-tab="tests">Test bench</button>
+  <button data-tab="saved">Saved</button>
+</nav>
+
+<section id="tab-explain" class="panel tabpane">
+  <h2>What each piece does</h2>
+  <table id="tokens" class="tokens"></table>
+  <h2>Capture groups</h2>
+  <div id="captures" class="captures"></div>
+  <h2>Save this analysis</h2>
+  <div class="row">
+    <input id="note" placeholder="note for later (why this pattern, what it matches)">
+    <button id="save">Save</button>
+    <span id="save-msg" class="note"></span>
+  </div>
+</section>
+
+<section id="tab-redos" class="panel tabpane hidden">
+  <h2>Catastrophic backtracking (ReDoS)</h2>
+  <p class="hint">Each finding below was found by static analysis, then confirmed by actually running the
+  pattern against a generated attack string in a throwaway process. The measured time is real.</p>
+  <div id="redos-list"></div>
+</section>
+
+<section id="tab-engines" class="panel tabpane hidden">
+  <h2>Will this run everywhere?</h2>
+  <p class="hint">Eight engines, checked against the constructs your pattern actually uses. "caution" means it
+  parses, but matches something subtly different.</p>
+  <div id="matrix"></div>
+</section>
+
+<section id="tab-tests" class="panel tabpane hidden">
+  <h2>Test bench</h2>
+  <p class="hint">One case per line. Prefix with <code>!</code> to assert it must NOT match.</p>
+  <textarea id="cases" rows="7" spellcheck="false"
+placeholder="user@example.com
+bad@@example.com
+!not-an-email"></textarea>
+  <div class="row"><button id="runtests">Run tests</button><span id="test-msg" class="note"></span></div>
+  <div id="test-results"></div>
+</section>
+
+<section id="tab-saved" class="panel tabpane hidden">
+  <h2>Saved analyses</h2>
+  <div class="row"><button id="reload-saved">Refresh</button></div>
+  <div id="saved-list"></div>
+</section>
+
+<footer>Local-first. Nothing leaves this machine. <span id="health"></span></footer>
+<script src="/static/app.js"></script>
+</body>
+</html>
